@@ -1,20 +1,19 @@
-# Use Node.js as base image
-FROM node:16-alpine
+# Use Node 18+
+FROM node:18-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy only the dependency files first (for better caching)
 COPY package.json package-lock.json ./
 
-# Install dependencies
+# Install deps inside the container
 RUN npm ci
 
-# Copy the rest of the application
+# Copy the rest of the app AFTER installing
 COPY . .
 
-# Expose port 3000
-EXPOSE 3000
+# Optional: double-check that v3 is gone
+RUN npm ls tailwindcss --depth=3
 
-# Start development server
+# Start the app
 CMD ["npm", "start"]
