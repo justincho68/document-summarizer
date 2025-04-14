@@ -17,6 +17,16 @@ async def save_upload_file(upload_file: UploadFile) -> str:
     file_path = UPLOAD_DIR / unique_filename
 
     with open(file_path, "wb") as buffer:
+        #reads entire block asynchronously and is non-blocking
         content = await upload_file.read()
         buffer.write(content)
+    #full path to newly saved file 
+    #should be in form uploads/unique id .pdf
     return str(file_path)
+
+def clean_up_file(file_path: str) -> None:
+    try:
+        #attempt OS level file system delete
+        os.remove(file_path)
+    except Exception as e:
+        print(f"Error removing file {file_path}: {e}")
