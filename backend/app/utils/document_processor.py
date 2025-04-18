@@ -19,6 +19,24 @@ except OSError:
     spacy.cli.download("en_core_web_sm")
     nlp = spacy.load("en_core_web_sm")
 
+def fix_spacing_issue(text):
+    #fix common spacing issues in extracted text
+    import re
+    text = re.sub(r' +', ' ', text)
+    #add space after period if there is capital letter
+    text = re.sub(r'\.([A-Z])', r'. \1', text)
+    #add spaces after comma
+    text = re.sub(r',([a-zA-Z0-9])', r', \1', text)
+    #fixing common joined word problems
+    text = re.sub(r'([a-z])([A-Z][a-z])', r'\1 \2', text)
+    #missing spaces between sentences
+    text = re.sub(r'(\w)\.(\w)', r'\1. \2', text)
+    #spaces before punctuation
+    text = re.sub(r' ([.,;:!?])', r'\1', text)
+    text = re.sub(r'([A-Z][a-z]+)([A-Z])', r'\1 \2', text)
+    text = re.sub(r'(\w)\.(\w)', r'\1. \2', text)
+    return text
+
 def extract_text_from_pdf(file_path):
     text = ""
     try:
@@ -27,7 +45,9 @@ def extract_text_from_pdf(file_path):
             pdf_reader = pypdf.PdfReader(file)
             #iterating through every page in the pdf
             for page in pdf_reader.pages:
-                text += page.extract_text() + "\n"
+                page_text = page.extract_text(extraction_mode="layout", layout_mode_space_vertically=False)
+                text += page_text + "\n"
+        text = fix_spacing_issue(text)
     except Exception as e:
         print(f"Error extracting text from PDF: {e}")
     return text
@@ -53,7 +73,7 @@ def extract_text_from_txt(file_path):
         return ""
 
 def extract_text(file_path):
-    file_extension = os.path.splittext(file_path)[1].lower()
+    file_extension = os.path.splitext(file_path)[1].lower()
     if file_extension == ".pdf":
         return extract_text_from_pdf(file_path)
     elif file_extension == ".docx":
@@ -71,6 +91,7 @@ def preprocess_text(text):
     import re
     #replaces all white space characters with a single space
     text = re.sub(r'\s+',' ', text)
+    text = fix_spacing_issue(text)
     return text
 
 def advanced_preprocess(text):

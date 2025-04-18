@@ -2,13 +2,16 @@ version: '3'
 
 services:
   backend:
-    build: ./backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "8000:5000"
     volumes:
       - ./backend:/app
     environment:
       - PYTHONPATH=/app
+      - DOCKER_BUILDKIT=1
     command: uvicorn app.main:app --host 0.0.0.0 --port 5000 --reload
 
   frontend:

@@ -10,13 +10,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     TRANSFORMERS_CACHE=/app/.cache \
     PYTHONPATH=/app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    curl \
-    git \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Copy and run the fix script
+COPY apt-fix.sh /apt-fix.sh
+RUN chmod +x /apt-fix.sh && /apt-fix.sh
 
 # Install Python dependencies
 COPY requirements.txt .
@@ -35,5 +31,6 @@ RUN mkdir -p /app/.cache && chmod 777 /app/.cache
 # Expose port for API
 EXPOSE 5000
 
+RUN python3 -m nltk.downloader punkt
 # Start command for development (can be overridden in docker-compose)
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]

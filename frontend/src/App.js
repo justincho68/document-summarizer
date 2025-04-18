@@ -13,7 +13,7 @@ function App() {
           Document Summarizer
         </h1>
         <p className='mt-2 text-sm text-gray-600'>
-          Upload a document and receive a summary!
+          By: Justin Cho
         </p>
       </div>
       <FileUpload onSummaryReceived={setSummary} />
