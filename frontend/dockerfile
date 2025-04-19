@@ -3,6 +3,10 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# Set environment variables
+ENV CHOKIDAR_USEPOLLING=true \
+    WDS_SOCKET_PORT=3000
+
 # Copy only the dependency files first (for better caching)
 COPY package.json package-lock.json ./
 
