@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+const API_URL = process.env.REACT_APP_API_URL || 'https://document-summarizer-5zlz.onrender.com';
+
 const FileUpload = ({ onSummaryReceived }) => {
     //holds uploaded file but is initially empty
     //const [value, setValue] = useState(initialValue)
@@ -48,7 +50,7 @@ const FileUpload = ({ onSummaryReceived }) => {
             const response = await axios.post(
                 //URL of the API stored in the env variable
                 //formdata contains body of request - uploaded file
-                `${process.env.REACT_APP_API_URL}/summarize`,
+                `${API_URL}/summarize`,
                 formData,
                 {
                     //ensure correct formatting

@@ -4,10 +4,6 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Set environment variables
-ENV CHOKIDAR_USEPOLLING=true \
-    WDS_SOCKET_PORT=3000
-
-# Copy only the dependency files first (for better caching)
 COPY package.json package-lock.json ./
 
 # Install deps inside the container
@@ -16,8 +12,11 @@ RUN npm ci
 # Copy the rest of the app AFTER installing
 COPY . .
 
-# Optional: double-check that v3 is gone
-RUN npm ls tailwindcss --depth=3
+# Build for production instead of using development server
+RUN npm run build
 
-# Start the app
-CMD ["npm", "start"]
+# Use a lightweight web server to serve the static files
+RUN npm install -g serve
+
+# Start the app in production mode
+CMD ["serve", "-s", "build", "-l", "3000"]
