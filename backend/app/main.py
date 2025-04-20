@@ -10,14 +10,15 @@ app = FastAPI()
 
 summarizer = Summarizer()
 
-FRONTEND_URL = os.getenv("FRONTEND_URL", "https://document-summarizer-1.onrender.com")
-# Add CORS middleware
+origins = ["https://document-summarizer-1.onrender.com"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_URL],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 @app.get("/")
