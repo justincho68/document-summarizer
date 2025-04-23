@@ -19,4 +19,5 @@ RUN npm run build
 RUN npm install -g serve
 
 # Start the app in production mode
-CMD ["serve", "-s", "build", "-l", "3000"]
+CMD ["sh", "-c", "serve -s build -l ${PORT:-3000}"]
+
