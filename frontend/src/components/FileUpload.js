@@ -41,6 +41,7 @@ const FileUpload = ({ onSummaryReceived }) => {
         formData.append('ratio', ratio);
 
         setLoading(true);
+        console.log("API URL being used:", `${API_URL}/summarize`);
 
 
         //utilize post request that send data to a server
@@ -57,6 +58,7 @@ const FileUpload = ({ onSummaryReceived }) => {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
+                    withCredentials: true,
                 }
             );
             onSummaryReceived(response.data);

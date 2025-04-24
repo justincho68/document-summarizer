@@ -79,6 +79,8 @@ async def summarize_document(
     min_length: int = Form(50),
     ratio: float = Form(0.3)
     ):
+    response = Response()
+    response.headers["Access-Control-Allow-Origin"] = "https://document-summarizer-1.onrender.com"
     # This is just a placeholder - you'll implement the actual summarization later
     if file.filename == "":
         raise HTTPException(status_code=400, detail="No file provided")
