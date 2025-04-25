@@ -1,6 +1,8 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException, Form, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 import os
+import json
 
 from app.utils.file_handler import save_upload_file, clean_up_file
 from app.utils.document_processor import extract_text, preprocess_text, advanced_preprocess, fix_spacing_issue
@@ -16,17 +18,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
-
-@app.options("/summarize")
-async def options_handler():
-    response = Response()
-    response.headers["Access-Control-Allow-Origin"] = "https://document-summarizer-1.onrender.com"
-    response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-    return response
 
 import logging
 
@@ -36,9 +30,15 @@ logger = logging.getLogger(__name__)
 @app.middleware("http")
 async def log_requests(request, call_next):
     logger.info(f"Request: {request.method} {request.url}")
+    logger.info(f"Request Origin: {request.headers.get('origin')}")
     logger.info(f"Headers: {request.headers}")
+    
     response = await call_next(request)
+    
+    # Log response info
     logger.info(f"Response status: {response.status_code}")
+    logger.info(f"Response CORS headers: {response.headers.get('access-control-allow-origin')}")
+    
     return response
 
 @app.get("/")
@@ -116,12 +116,19 @@ async def summarize_document(
             summary_type = "Hybrid"
         clean_up_file(file_path)
 
-        return {
+        result = {
             "filename": file.filename,
             "text_length": len(processed_text),
             "summary_type": summary_type,
             "summary": summary
         }
+        return JSONResponse(
+            content=result,
+            headers={
+                "Access-Control-Allow-Origin": "https://document-summarizer-1.onrender.com",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        )
     except Exception as e:
         import traceback
         traceback.print_exc()
